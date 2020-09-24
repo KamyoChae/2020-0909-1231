@@ -1,0 +1,204 @@
+<template>
+  <div id="app"> 
+    <ul class="table-body_row" v-for="(row, index) in currentDiningList" :key="index">
+      <li class="checked">
+        <el-checkbox v-model="checkedList[index]" @change="handleCheckAll(index)">
+        </el-checkbox>
+      </li>
+      <li class="table-body-time" v-for="(item, i) in row" :key="i">
+        <div>{{item.date}}号</div>
+        <p v-if="item.state=='1'" style="background: #24977a; color:#fff" @click="submit(index, i, item)">
+          申请午餐
+        </p>
+        <p v-else style="background: #c48f1f; color:#fff" >已经申请</p>
+      </li>
+    </ul>
+    <div class="checkboxlist">
+      <div v-for="(applyListItem, row) in applyList" :key="row">
+        <label
+        v-for="(item, col) in applyListItem"
+        :key="item.date"
+        @click="deleteApplyListItem(row, col)">
+          <span 
+          v-if="item!=''"> 
+            {{item.date}}号
+          </span> 
+        </label>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  name: "App",
+  data() {
+    return {
+      watchdata:1, 
+      checkedList:[false,false],
+      applyList:[[],[],[]], // 已经勾选的数据
+      currentDiningList: [
+        [
+          {
+            date: 12,
+            state: "1",
+          },
+          {
+            date: 13,
+            state: "1",
+          },
+          {
+            date: 14,
+            state: "1",
+          },
+          {
+            date: 15,
+            state: "1",
+          },
+          {
+            date: 16,
+            state: "1",
+          },
+          {
+            date: 17,
+            state: "1",
+          },
+          {
+            date: 18,
+            state: "1",
+          },
+        ],
+        [
+          {
+            date: 19,
+            state: "1",
+          },
+          {
+            date: 20,
+            state: "1",
+          },
+          {
+            date: 21,
+            state: "1",
+          },
+          {
+            date: 22,
+            state: "1",
+          },
+          {
+            date: 23,
+            state: "1",
+          },
+          {
+            date: 24,
+            state: "1",
+          },
+          {
+            date: 25,
+            state: "1",
+          },
+        ],
+      ],
+    };
+  }, 
+  methods: {
+    deleteApplyListItem(row, col){
+      // 单个删除 
+      this.applyList[row].splice(col, 1, "")  
+      this.currentDiningList[row][col].state = "1"
+      console.log(this.applyList[row])
+      if(
+        this.applyList[row].every((el)=>{
+          return el==''
+        })
+      ){
+        // 判断是否删除完毕
+        console.log("删除完毕", row) 
+        this.checkedList.splice(row, 1, false) 
+        console.log(this.checkedList)
+        this.applyList[row] = [] 
+        this.watchdata  = 0
+        
+      }
+      
+      this.watchdata ++ 
+    },
+    deleteDinger(index){
+      // 删除已勾选数据列表
+      this.$set(this.applyList, index, [])
+      this.currentDiningList[index].forEach(element => {
+          element.state="1"
+        });
+
+      // this.applyList[index] = [] 
+    },
+    applyDinger(item,index){
+      item.state="0" // 修改状态
+      this.applyList[index].push(item)
+    },
+    handleCheckAll(index) {
+      let that = this  
+      console.log(this.checkedList[index])
+      if(this.checkedList[index]){
+        console.log("存入applyList列表") 
+        console.log(this.applyList)
+        this.currentDiningList[index].forEach(element => {
+          that.applyDinger(element, index) 
+        });
+      }else{
+        console.log("从applyList列表删除")
+        that.deleteDinger(index) 
+      }
+      //  this.checkedList[index] = !this.checkedList[index]
+      
+    },
+    submit(row, col, item) {
+      // col 第几列， row 第几行
+      console.log("点击申请按钮",row, col);
+      item.state = "0"
+      this.applyList[row].push(item) 
+      if(this.applyList[row].length == this.currentDiningList[row].length){
+        // 如果选满了
+        this.checkedList[row] = true
+      }else{ 
+        this.checkedList[row] = false
+      }
+    },
+  },
+};
+</script>
+
+<style>
+#app {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+  margin-top: 60px;
+}
+.table-body_row {
+  background: #eee;
+}
+.table-body_row li {
+  cursor: pointer;
+  display: inline-block;
+  margin: 1em;
+  padding: 20px;
+  border: 1px solid #977324;
+}
+.checkboxlist{
+  cursor: pointer;
+  border: 1px solid #888;
+  height: 300px;
+  width: 70%;
+  margin: auto;
+}
+.checkboxlist span{
+  display: inline-block;
+  padding: .3em 3em;
+  background: #2a75c0;
+  color: #fff;
+  margin: .5em;
+}
+</style>
